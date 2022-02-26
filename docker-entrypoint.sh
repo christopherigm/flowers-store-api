@@ -1,6 +1,7 @@
 #!/bin/bash
 
-echo "ENVT $ENVT"
+echo "ENVT: $ENVT"
+echo "BRANCH: $BRANCH"
 
 # Collect static files
 echo "Collect static files"
