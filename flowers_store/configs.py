@@ -12,7 +12,7 @@ environment=environ.Env(
     DB_USER=(str, 'flowers-store-api'),
     DB_PASSWORD=(str, 'flowers-store-api'),
     EMAIL_HOST_USER=(str, 'john@doe.com'),
-    EMAIL_HOST_PASSWORD=(str, 'pass'),
+    EMAIL_HOST_PASSWORD=(str, 'password'),
     OP_API_KEY=(str, 'my-key'),
     OP_MERCHANT_ID=(str, 'my-id'),
 )

@@ -12,7 +12,9 @@
     "migrate": "python manage.py migrate",
     "freeze": "python -m pip freeze -l > requirements.txt",
     "setup-configurations": "./deploy/setup-configurations.sh",
-    "uninstall": "./deploy/uninstall.sh"
+    "uninstall": "./deploy/uninstall.sh",
+    "deploy": "node build-and-deploy.js",
+    "deploy:prod": "node build-and-deploy.js --production"
   },
   "repository": {
     "type": "git",
@@ -23,5 +25,8 @@
   ],
   "author": "Christopher Irak Guzman Monsalvo",
   "license": "Copyright",
-  "homepage": "https://github.com/christopherigm/flowers-store-api"
+  "homepage": "https://github.com/christopherigm/flowers-store-api",
+  "devDependencies": {
+    "axios": "^0.26.0"
+  }
 }
