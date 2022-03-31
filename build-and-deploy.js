@@ -1,14 +1,23 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const { exec } = require('child_process');
 const { exit } = require('process');
 const https = require('https');
 const axios = require('axios');
+
+// Editable variables
 const name = 'flowers-store-api';
+const jenkinsURL = 'https://jenkins.iguzman.com.mx';
+const jenkinsURLProd = 'https://jenkins.nedii.com';
+const apiURL = 'https://api.nedii.iguzman.com.mx/v1/';
+const apiURLProd = 'https://api.nedii.com.mx/v1/';
+const registry = 'registry.iguzman.com.mx';
+// Editable variables
+
 const args = process.argv;
-const jenkinsURL = args && args.length &&
-  args.length === 3 && args[2] === '--production' ? 
-  `https://jenkins.nedii.com/generic-webhook-trigger/invoke?token=${name}` :
-  `https://jenkins.longmont.iguzman.com.mx/generic-webhook-trigger/invoke?token=${name}`;
-const registry = 'longmont.iguzman.com.mx:5000';
+const isProduction = args && args.length &&
+  args.length === 3 && args[2] === '--production' ? true : false;
+const jenkins = `${ isProduction ? jenkinsURLProd : jenkinsURL}/generic-webhook-trigger/invoke?token=${name}`;
+
 let branch = '';
 const startTime = new Date(Date.now());
 
@@ -21,7 +30,7 @@ const instance = axios.create({
 const triggerJenkinsJob = () => {
   return new Promise((res, rej) => {
     console.log('\n========= Triggering Jenkins Job =========');
-    instance.post(jenkinsURL, {
+    instance.post(jenkins, {
       BRANCH: branch
     })
       .then((response) => {
@@ -37,7 +46,8 @@ const getBranchName = () => {
   return new Promise((res, rej) => {
     exec('git branch --show-current', (err, stdout) => {
       if (err) return rej(err);
-      const branch = stdout.toString().replace(/(\r\n|\n|\r)/gm, '');
+      const b = stdout.toString().replace(/(\r\n|\n|\r)/gm, '');
+      branch = b;
       res(branch);
     });
   });
@@ -46,19 +56,11 @@ const getBranchName = () => {
 const tagDockerImage = () => {
   return new Promise((res, rej) => {
     console.log('\n========= Tagging Docker Image =========');
-    getBranchName()
-      .then((data) => {
-        branch = data;
-        console.log('\nBranch:', branch);
-        exec(`docker tag ${name} ${registry}/${name}:${branch}`, (err, stdout) => {
-          if (err) return rej(err);
-          console.log('\nDocker Image tagged!');
-          res(stdout);
-        });
-      })
-      .catch((err) => {
-        console.log('\nBuild Docker image error:', err);
-      });
+    exec(`docker tag ${name} ${registry}/${name}:${branch}`, (err, stdout) => {
+      if (err) return rej(err);
+      console.log('\nDocker Image tagged!');
+      res(stdout);
+    });
   });
 };
 
@@ -82,7 +84,7 @@ const publishDockerImage = () => {
 const buildDockerImage = () => {
   return new Promise((res, rej) => {
     console.log('\n========= Building Docker Image =========');
-    exec(`docker build -t ${name} .`, (err, stdout) => {
+    exec(`docker build -t ${name} --build-arg REACT_APP_API_URL=${isProduction ? apiURLProd : apiURL} --build-arg REACT_APP_BRANCH_NAME=${branch} --build-arg REACT_APP_FACEBOOK_APP_ID=ddf844gh48gh4g --build-arg REACT_APP_PRODUCTION=${true} .`, (err, stdout) => {
       if (err) return rej(err);
       console.log('\nDocker Image built');
       res(stdout);
@@ -90,28 +92,35 @@ const buildDockerImage = () => {
   });
 };
 
-buildDockerImage()
+getBranchName()
+  .then(() => buildDockerImage())
   .then(() => tagDockerImage())
   .then(() => publishDockerImage())
   .then(() => triggerJenkinsJob())
   .then((response) => {
-    if ( response && response.jobs &&
-      response.jobs['Flowers-Store-API'] &&
-      response.jobs['Flowers-Store-API'].triggered ) {
-      console.log('\nProces completed!:', response.message);
-      console.log(`\nImage: ${registry}/${name}:${branch}`);
-    } else {
-      console.log('\nError triggering Jenkins job', response);
-      console.log(`\nImage: ${registry}/${name}:${branch}`);
+    if ( response && response.jobs && typeof response.jobs === 'object' ) {
+      for (const key in response.jobs) {
+        if (Object.hasOwnProperty.call(response.jobs, key)) {
+          const element = response.jobs[key];
+          if ( element && element.triggered ) {
+            console.log('\nProces completed!:', response.message);
+            console.log(`\nImage: ${registry}/${name}:${branch}`);
+          }
+        }
+      }
     }
     const endTime = new Date(Date.now());
-    const difference = (((endTime - startTime)/100)/60)/60;
+    const difference = (((endTime - startTime) / 100 ) / 60) / 60;
     console.log('\nStarting time:', startTime);
     console.log('Ending time:', endTime);
     console.log('Processing time:', Math.round((difference + Number.EPSILON) * 100) / 100, 'minutes.');
     exit(1);
   })
   .catch((err) => {
-    console.log('\nError:', err);
+    if ( err && err.response && err.response.statusText ) {
+      console.log('\nError:', err.response.statusText);
+    } else {
+      console.log('\nError:', err);
+    }
     exit(1);
   });

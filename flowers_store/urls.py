@@ -111,8 +111,7 @@ schema_view=get_schema_view(
 )
 
 urlpatterns=[
-    # url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS
-    # path('jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
+    path('jet/', include('jet.urls', 'jet')),
     path('admin/', admin.site.urls),
     re_path(r'^v1/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
