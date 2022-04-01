@@ -10,16 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
-from pathlib import Path
 import os
 from datetime import timedelta
 from django.contrib import admin
 from .configs import env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-ENVIRONMENT = env.ENVT
+ENVIRONMENT = env.ENVIRONMENT
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -37,6 +36,7 @@ SECURE_PROXY_SSL_HEADER = env.SECURE_PROXY_SSL_HEADER
 # Application definition
 
 INSTALLED_APPS = [
+    'jet',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -159,6 +159,7 @@ EMAIL_HOST_USER = env.EMAIL_HOST_USER
 EMAIL_HOST_PASSWORD = env.EMAIL_HOST_PASSWORD
 
 API_URL = env.API_URL
+
 WEB_APP_URL = env.WEB_APP_URL
 
 # Static files (CSS, JavaScript, Images)
@@ -247,6 +248,41 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
+
+JET_THEMES = [
+    {
+        'theme': 'default',  # theme folder name
+        'color': '#47bac1',  # color of the theme's button in user menu
+        'title': 'Default'  # theme title
+    },
+    {
+        'theme': 'green',
+        'color': '#44b78b',
+        'title': 'Green'
+    },
+    {
+        'theme': 'light-green',
+        'color': '#2faa60',
+        'title': 'Light Green'
+    },
+    {
+        'theme': 'light-violet',
+        'color': '#a464c4',
+        'title': 'Light Violet'
+    },
+    {
+        'theme': 'light-blue',
+        'color': '#5EADDE',
+        'title': 'Light Blue'
+    },
+    {
+        'theme': 'light-gray',
+        'color': '#222',
+        'title': 'Light Gray'
+    }
+]
+
+JET_SIDE_MENU_COMPACT = False
 
 TINYMCE_JS_ROOT = os.path.join(STATIC_URL, 'tinymce/js/tinymce/')
 TINYMCE_JS_URL = os.path.join(STATIC_URL, 'tinymce/js/tinymce/tinymce.min.js')

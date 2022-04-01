@@ -7,7 +7,7 @@ BASE_DIR=Path(__file__).resolve().parent.parent
 
 environment=environ.Env(
     SECRET_KEY=(str, 'key'),
-    ENVT=(str, 'localhost'),
+    ENVIRONMENT=(str, 'localhost'),
     DB_NAME=(str, 'flowers-store-api'),
     DB_USER=(str, 'flowers-store-api'),
     DB_PASSWORD=(str, 'flowers-store-api'),
@@ -19,9 +19,8 @@ environment=environ.Env(
 
 environ.Env.read_env()
 
-
 SECRET_KEY=environment('SECRET_KEY')
-ENVT=environment('ENVT')
+ENVIRONMENT=environment('ENVIRONMENT')
 DB_NAME=environment('DB_NAME')
 DB_USER=environment('DB_USER')
 DB_PASSWORD=environment('DB_PASSWORD')
@@ -55,7 +54,7 @@ class Common:
     }
     EMAIL_HOST_USER=EMAIL_HOST_USER
     EMAIL_HOST_PASSWORD=EMAIL_HOST_PASSWORD
-    ENVT=ENVT
+    ENVIRONMENT=ENVIRONMENT
     MEDIA_ROOT='/media'
     STATIC_ROOT='/static'
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -80,8 +79,8 @@ class LOCAL(Common):
 
 
 class STAGING(Common):
-    WEB_APP_URL='https://flowers-store.iguzman.com.mx/'
-    API_URL='https://api.flowers-store.iguzman.com.mx/'
+    WEB_APP_URL='https://flowers-store.vaggustudios.com.mx/'
+    API_URL='https://api.flowers-store.vaggustudios.com.mx/'
 
 
 class MASTER(Common):
@@ -94,9 +93,9 @@ class MASTER(Common):
     API_URL='https://api.flowers-store.com/'
 
 
-if ENVT == 'staging':
+if ENVIRONMENT == 'staging':
     env=STAGING
-elif ENVT == 'master':
+elif ENVIRONMENT == 'master':
     env=MASTER
 else:
     env=LOCAL

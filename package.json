@@ -6,13 +6,9 @@
   "scripts": {
     "start": "python manage.py runserver 0.0.0.0:8000",
     "static": "python manage.py collectstatic --noinput",
-    "user": "./utils/createsuperuser.sh",
-    "app": "./utils/createapp.sh",
     "migrations": "python manage.py makemigrations",
     "migrate": "python manage.py migrate",
     "freeze": "python -m pip freeze -l > requirements.txt",
-    "setup-configurations": "./deploy/setup-configurations.sh",
-    "uninstall": "./deploy/uninstall.sh",
     "deploy": "node build-and-deploy.js",
     "deploy:prod": "node build-and-deploy.js --production"
   },
